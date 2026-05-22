@@ -317,6 +317,7 @@
 
     /* INFO PANEL (RIGHT) */
     #info-panel {
+      display: none;
       width: clamp(220px, 28vw, 420px);
       min-width: 200px;  
       max-width: 420px;
@@ -325,7 +326,6 @@
       color: var(--text-black);
       padding: clamp(8px, 1.2vw, 16px) clamp(10px, 1.5vw, 20px) clamp(8px, 1.2vw, 16px) clamp(8px, 1vw, 12px);
       box-sizing: border-box;
-      display: flex;
       flex-direction: column;
       border-left: 1px solid var(--white);
       font-size: clamp(12px, 1.1vw, 15px);
@@ -470,7 +470,6 @@
         padding: 12px;
         border-left: none;
         border-top: 2px solid var(--shadow-grey);
-        display: grid;
         grid-template-columns: 1fr auto;
         grid-template-rows: auto auto auto auto auto 1fr auto;
         gap: 2px;
@@ -2085,21 +2084,20 @@
 
   function updateInfoPanelVisibility() {
     const panel = document.getElementById('info-panel');
-    if (panel) {
-      if (formattingSettings.infoPanelOn) {
-        panel.style.display = '';
-      } else {
-        panel.style.display = 'none';
-      }
-      // Trigger resize after layout change
-      setTimeout(() => {
-        resizeCanvas();
-        if (nodes.length > 0) {
-          computeGridLayout();
-        }
-        render();
-      }, 50);
+    if (!panel) return;
+    if (formattingSettings.infoPanelOn) {
+      const isMobile = window.matchMedia('(max-width: 700px)').matches;
+      panel.style.display = isMobile ? 'grid' : 'flex';
+    } else {
+      panel.parentNode.removeChild(panel);
+      const graphArea = document.getElementById('graph-area');
+      if (graphArea) graphArea.style.maxHeight = 'none';
     }
+    setTimeout(() => {
+      resizeCanvas();
+      if (nodes.length > 0) computeGridLayout();
+      render();
+    }, 50);
   }
 
   /************************************************************************
